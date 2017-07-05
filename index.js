@@ -26,7 +26,7 @@ Object.defineProperty(_, 'size', {'get': function() {
 		this.fn.call(this.ths, `SELECT COUNT(*) AS Cnt FROM "${this.tab}"`, (err, res) => {
 			console.log('size;c');
 			if(err) frej(err);
-			else fres(res.rows[0].Cnt);
+			else fres(res.rows);
 		});
 	});
 }});
