@@ -15,7 +15,6 @@ pool.connect(function(err, db, done) {
 	if(err) throw err;
 	console.log('pg.connect: done');
 	var m = new mappg(db.query, db);
-	console.log('map created');
 	m.size.then((n) => console.log('size: %d', n));
 	m.set('a', '0').then(() => console.log('set: a=0'));
 	m.set('b', '1').then(() => console.log('set: b=1'));
