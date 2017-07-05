@@ -8,7 +8,7 @@ var $ = function(fn, ths, tab, key, val) {
 	this.tab = tab || 'MAP';
 	this.key = key || 'Key';
 	this.val = val || 'Val';
-	this.fn(`CREATE TABLE IF NOT EXISTS ${this.tab}(${this.key} TEXT PRIMARY KEY, ${this.val} TEXT)`, (err, res) => {
+	this.fn.call(this.ths, `CREATE TABLE IF NOT EXISTS ${this.tab}(${this.key} TEXT PRIMARY KEY, ${this.val} TEXT)`, (err, res) => {
 		if(err) throw err;
 	});
 };
