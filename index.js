@@ -18,8 +18,13 @@ var _ = $.prototype;
 
 
 Object.defineProperty(_, 'size', {'get': function() {
+	var o = this;
+	console.log('size;a');
 	return new Promise((fres, frej) => {
+		console.log('size;b');
+		console.log(o===this);
 		this.fn.call(this.ths, `SELECT COUNT(*) AS Cnt FROM ${this.tab}`, (err, res) => {
+			console.log('size;c');
 			if(err) frej(err);
 			else fres(res.rows[0].Cnt);
 		});
@@ -48,8 +53,11 @@ _.get = function(k) {
 
 
 _.set = function(k, v) {
+	console.log('set;a');
 	return new Promise((fres, frej) => {
+		console.log('set;b');
 		this.fn.call(this.ths, `INSERT INTO ${this.tab} VALUES($1, $2) ON CONFLICT DO UPDATE SET ${this.val}=$2 WHERE ${this.key}=$1`, k, v, (err, res) => {
+			console.log('set;c');
 			if(err) frej(err);
 			else fres(res.rowCount);
 		});
