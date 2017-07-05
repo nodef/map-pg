@@ -6,8 +6,8 @@ var $ = function(fn, ths, tab, key, val) {
 	this.fn = fn;
 	this.ths = ths;
 	this.tab = tab || 'MAP';
-	this.key = key || 'Key';
-	this.val = val || 'Val';
+	this.key = key || 'key';
+	this.val = val || 'val';
 	this.fn.call(this.ths, `CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`, (err, res) => {
 		if(err) throw err;
 	});
@@ -23,10 +23,10 @@ Object.defineProperty(_, 'size', {'get': function() {
 	return new Promise((fres, frej) => {
 		console.log('size;b');
 		console.log(o===this);
-		this.fn.call(this.ths, `SELECT COUNT(*) AS Cnt FROM "${this.tab}"`, (err, res) => {
+		this.fn.call(this.ths, `SELECT COUNT(*) AS cnt FROM "${this.tab}"`, (err, res) => {
 			console.log('size;c');
 			if(err) frej(err);
-			else fres(res.rows);
+			else fres(res.rows[0].cnt);
 		});
 	});
 }});
