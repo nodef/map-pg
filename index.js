@@ -5,9 +5,9 @@
 var $ = function(fn, ths, tab, key, val) {
 	this.fn = fn;
 	this.ths = ths;
-	this.tab = tab || 'OMAP';
-	this.key = key || 'okey';
-	this.val = val || 'oval';
+	this.tab = tab || 'MAP';
+	this.key = key || 'key';
+	this.val = val || 'val';
 	this.fn.call(this.ths, `CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`, (err, res) => {
 		if(err) throw err;
 	});
