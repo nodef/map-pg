@@ -40,7 +40,7 @@ _.get = function(k) {
 	return new Promise((fres, frej) => {
 		this.db.query(`SELECT "${this.val}" AS val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
-			else fres(res.rows[0].val);
+			else fres(res.rowCount>0? res.rows[0].val : undefined);
 		});
 	});
 };
