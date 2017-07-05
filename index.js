@@ -5,7 +5,7 @@
 var $ = function(fn, ths, tab, key, val) {
 	this.fn = fn;
 	this.ths = ths;
-	this.tab = tab || 'MAP';
+	this.tab = tab || 'OMAP';
 	this.key = key || 'okey';
 	this.val = val || 'oval';
 	console.log(`CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`);
@@ -47,9 +47,9 @@ _.has = function(k) {
 _.get = function(k) {
 	return new Promise((fres, frej) => {
 		console.log(`SELECT "${this.val}" AS Val FROM "${this.tab}" WHERE "${this.key}"=$1`);
-		this.fn.call(this.ths, `SELECT "${this.val}" AS Val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
+		this.fn.call(this.ths, `SELECT "${this.val}" AS val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
-			else fres(res.rows[0].Val);
+			else fres(res.rows[0].val);
 		});
 	});
 };
@@ -59,8 +59,8 @@ _.set = function(k, v) {
 	console.log('set;a');
 	return new Promise((fres, frej) => {
 		console.log('set;b');
-		console.log(`INSERT INTO "${this.tab}" VALUES($1, $2) ON CONFLICT ("${this.key}") DO UPDATE SET "${this.val}"=$2 WHERE "${this.key}"=$1`);
-		this.fn.call(this.ths, `INSERT INTO "${this.tab}" VALUES($1, $2) ON CONFLICT ("${this.key}") DO UPDATE SET "${this.val}"=$2 WHERE "${this.key}"=$1`, [k, v], (err, res) => {
+		console.log(`INSERT INTO "${this.tab}" ("${this.key}", "${this.val}") VALUES ($1, $2) ON CONFLICT ("${this.tab}"."${this.key}") DO UPDATE SET "${this.val}"=$2 WHERE "${this.key}"=$1`);
+		this.fn.call(this.ths, `INSERT INTO "${this.tab}" ("${this.key}", "${this.val}") VALUES ($1, $2) ON CONFLICT ("${this.key}") DO UPDATE SET "${this.val}" = $2;`, [k, v], (err, res) => {
 			console.log('set;c');
 			if(err) frej(err);
 			else fres(res.rowCount);
