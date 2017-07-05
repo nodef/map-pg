@@ -2,13 +2,12 @@
 /* @wolfram77 */
 'use strict';
 (function() {
-var $ = function(t, fn, tab, key, val) {
-	this.fn = fn;
-	this.t = t;
+var $ = function(db, tab, key, val) {
+	this.db = db;
 	this.tab = tab || 'MAP';
 	this.key = key || 'key';
 	this.val = val || 'val';
-	this.fn.call(this.t, `CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`, (err, res) => {
+	this.db.query(`CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`, (err, res) => {
 		if(err) throw err;
 	});
 };
@@ -19,7 +18,7 @@ var _ = $.prototype;
 
 Object.defineProperty(_, 'size', {'get': function() {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.t, `SELECT COUNT(*) AS cnt FROM "${this.tab}"`, (err, res) => {
+		this.db.query(`SELECT COUNT(*) AS cnt FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
 			else fres(res.rows[0].cnt);
 		});
@@ -29,7 +28,7 @@ Object.defineProperty(_, 'size', {'get': function() {
 
 _.has = function(k) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.t, `SELECT "${this.key}" FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
+		this.db.query(`SELECT "${this.key}" FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount===1);
 		});
@@ -39,7 +38,7 @@ _.has = function(k) {
 
 _.get = function(k) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.t, `SELECT "${this.val}" AS val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
+		this.db.query(`SELECT "${this.val}" AS val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rows[0].val);
 		});
@@ -49,7 +48,7 @@ _.get = function(k) {
 
 _.set = function(k, v) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.t, `INSERT INTO "${this.tab}" ("${this.key}", "${this.val}") VALUES ($1, $2) ON CONFLICT ("${this.key}") DO UPDATE SET "${this.val}" = $2;`, [k, v], (err, res) => {
+		this.db.query(`INSERT INTO "${this.tab}" ("${this.key}", "${this.val}") VALUES ($1, $2) ON CONFLICT ("${this.key}") DO UPDATE SET "${this.val}" = $2`, [k, v], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount);
 		});
@@ -59,7 +58,7 @@ _.set = function(k, v) {
 
 _.delete = function(k) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.t, `DELETE FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
+		this.db.query(`DELETE FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount);
 		});
@@ -69,7 +68,7 @@ _.delete = function(k) {
 
 _.clear = function() {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.t, `DELETE FROM "${this.tab}"`, (err, res) => {
+		this.db.query(`DELETE FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount);
 		});
@@ -77,11 +76,11 @@ _.clear = function() {
 };
 
 
-_.forEach = function(fn) {
-	this.fn.call(this.t, `SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
+_.forEach = function(db) {
+	this.db.query(`SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
 		if(err) throw err;
 		for(var i=0, I=res.rowCount; i<I; i++) {
-			fn(res.rows[i].val, res.rows[i].key);
+			db(res.rows[i].val, res.rows[i].key);
 		}
 	});
 };
@@ -89,7 +88,7 @@ _.forEach = function(fn) {
 
 _.valueOf = function() {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.t, `SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
+		this.db.query(`SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
 			var a = new Map();
 			for(var i=0, I=res.rowCount; i<I; i++) {
