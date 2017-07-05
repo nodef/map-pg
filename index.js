@@ -41,7 +41,6 @@ _.get = function(k) {
 		this.db.query(`SELECT "${this.val}" AS val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rows.length>0? res.rows[0].val : undefined);
-			console.log(res);
 		});
 	});
 };
