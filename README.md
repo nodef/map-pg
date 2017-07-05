@@ -1,5 +1,7 @@
 # map-pg
 
+[![NPM](https://nodei.co/npm/map-pg.png)](https://nodei.co/npm/map-pg/)
+
 Map interface for PostgreSQL in Node.js.
 
 
