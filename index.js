@@ -2,26 +2,25 @@
 /* @wolfram77 */
 'use strict';
 (function() {
-$ = function(fn, ths, tab, key, val) {
-	this.fn = fn;
-	this.ths = ths;
+var $ = function(db, tab, key, val) {
+	this.db = db;
 	this.tab = tab || 'MAP';
-	this.key = key || 'Key';
-	this.val = val || 'Val';
-	this.fn(`CREATE TABLE IF NOT EXISTS ${this.tab}(${this.key} TEXT PRIMARY KEY, ${this.val} TEXT)`, (err, res) => {
+	this.key = key || 'key';
+	this.val = val || 'val';
+	this.db.query(`CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`, (err, res) => {
 		if(err) throw err;
 	});
 };
 
 
-_ = $.prototype;
+var _ = $.prototype;
 
 
 Object.defineProperty(_, 'size', {'get': function() {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `SELECT COUNT(*) AS Cnt FROM ${this.tab}`, (err, res) => {
+		this.db.query(`SELECT COUNT(*) AS cnt FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
-			else fres(res.rows[0].Cnt);
+			else fres(parseInt(res.rows[0].cnt));
 		});
 	});
 }});
@@ -29,7 +28,7 @@ Object.defineProperty(_, 'size', {'get': function() {
 
 _.has = function(k) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `SELECT ${this.key} FROM ${this.tab} WHERE ${this.key}=$1`, k, (err, res) => {
+		this.db.query(`SELECT "${this.key}" FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount===1);
 		});
@@ -39,9 +38,9 @@ _.has = function(k) {
 
 _.get = function(k) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `SELECT ${this.val} AS Val FROM ${this.tab} WHERE ${this.key}=$1`, k, (err, res) => {
+		this.db.query(`SELECT "${this.val}" AS val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
-			else fres(res.rows[0].Val);
+			else fres(res.rows.length>0? res.rows[0].val : undefined);
 		});
 	});
 };
@@ -49,7 +48,7 @@ _.get = function(k) {
 
 _.set = function(k, v) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `INSERT INTO ${this.tab} VALUES($1, $2) ON CONFLICT DO UPDATE SET ${this.val}=$2 WHERE ${this.key}=$1`, k, v, (err, res) => {
+		this.db.query(`INSERT INTO "${this.tab}" ("${this.key}", "${this.val}") VALUES ($1, $2) ON CONFLICT ("${this.key}") DO UPDATE SET "${this.val}" = $2`, [k, v], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount);
 		});
@@ -59,7 +58,7 @@ _.set = function(k, v) {
 
 _.delete = function(k) {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `DELETE FROM ${this.tab} WHERE ${this.key}=$1`, k, (err, res) => {
+		this.db.query(`DELETE FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount);
 		});
@@ -69,7 +68,7 @@ _.delete = function(k) {
 
 _.clear = function() {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `DELETE FROM ${this.tab}`, (err, res) => {
+		this.db.query(`DELETE FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
 			else fres(res.rowCount);
 		});
@@ -77,23 +76,26 @@ _.clear = function() {
 };
 
 
-_.forEach = function(fn) {
-	this.fn.call(this.ths, `SELECT ${this.key} AS Key, ${this.val} AS Val FROM ${this.tab}`, (err, res) => {
-		if(err) throw err;
-		for(var i=0, I=res.rowCount; i<I; i++) {
-			fn(res.rows[i].Val, res.rows[i].Key);
-		}
+_.forEach = function(fn, thisArg) {
+	return new Promise((fres, frej) => {
+		this.db.query(`SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
+			if(err) frej(err);
+			for(var i=0, I=res.rowCount; i<I; i++) {
+				fn.call(thisArg, res.rows[i].val, res.rows[i].key);
+			}
+			fres(res.rowCount);
+		});
 	});
 };
 
 
 _.valueOf = function() {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `SELECT ${this.key} AS Key, ${this.val} AS Val FROM ${this.tab}`, (err, res) => {
+		this.db.query(`SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
 			var a = new Map();
 			for(var i=0, I=res.rowCount; i<I; i++) {
-				a.set(res.rows[i].Key, res.rows[i].Val);
+				a.set(res.rows[i].key, res.rows[i].val);
 			}
 			fres(a);
 		});
