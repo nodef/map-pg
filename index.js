@@ -18,7 +18,6 @@ var _ = $.prototype;
 
 
 Object.defineProperty(_, 'size', {'get': function() {
-	var o = this;
 	return new Promise((fres, frej) => {
 		this.fn.call(this.ths, `SELECT COUNT(*) AS cnt FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
@@ -79,10 +78,10 @@ _.clear = function() {
 
 
 _.forEach = function(fn) {
-	this.fn.call(this.ths, `SELECT "${this.key}" AS Key, "${this.val}" AS Val FROM "${this.tab}"`, (err, res) => {
+	this.fn.call(this.ths, `SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
 		if(err) throw err;
 		for(var i=0, I=res.rowCount; i<I; i++) {
-			fn(res.rows[i].Val, res.rows[i].Key);
+			fn(res.rows[i].val, res.rows[i].key);
 		}
 	});
 };
@@ -90,11 +89,11 @@ _.forEach = function(fn) {
 
 _.valueOf = function() {
 	return new Promise((fres, frej) => {
-		this.fn.call(this.ths, `SELECT "${this.key}" AS Key, "${this.val}" AS Val FROM "${this.tab}"`, (err, res) => {
+		this.fn.call(this.ths, `SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
 			var a = new Map();
 			for(var i=0, I=res.rowCount; i<I; i++) {
-				a.set(res.rows[i].Key, res.rows[i].Val);
+				a.set(res.rows[i].key, res.rows[i].val);
 			}
 			fres(a);
 		});
