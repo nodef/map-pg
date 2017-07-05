@@ -4,7 +4,7 @@
   "description": "Test map-pg on Heroku.",
   "main": "test.js",
   "scripts": {
-  	"start": "node test.js",
+    "start": "node test.js",
     "test": "node test.js"
   },
   "repository": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/wolfram77/node-mappg#readme",
   "dependencies": {
+    "lodash": "^4.17.4",
     "pg": "^6.4.0",
     "pg-connection-string": "^0.1.3"
   }
