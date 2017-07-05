@@ -15,8 +15,7 @@ as maps, and thus you cannot expect *this* to have performed any action by the t
 next statement. So, all functions instead return a [Promise], which you can use to do something after
 a command is complete (and you have some result). If you have not heard of *Promises* (like me), they
 are an improved version of a [Callback] (anything more?). One thing more, *this* does not support iterators,
-but it does support `forEach`. Note: you need to install `pg` package separately in order to use *this*,
-it won\'t be installed by default when you install this.
+but it does support `forEach`.
 
 
 ## usage
