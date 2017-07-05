@@ -56,7 +56,7 @@ _.set = function(k, v) {
 	console.log('set;a');
 	return new Promise((fres, frej) => {
 		console.log('set;b');
-		this.fn.call(this.ths, `INSERT INTO ${this.tab} VALUES($1, $2) ON CONFLICT DO UPDATE SET ${this.val}=$2 WHERE ${this.key}=$1`, [k, v], (err, res) => {
+		this.fn.call(this.ths, `INSERT INTO ${this.tab} VALUES($1, $2) ON CONFLICT (${this.key}) DO UPDATE SET ${this.val}=$2 WHERE ${this.key}=$1`, [k, v], (err, res) => {
 			console.log('set;c');
 			if(err) frej(err);
 			else fres(res.rowCount);
