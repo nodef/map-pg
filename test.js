@@ -14,7 +14,7 @@ var pool = new pg.Pool(pgconfig(url));
 pool.connect(function(err, db, done) {
 	if(err) throw err;
 	console.log('pg.connect: done');
-	var m = new mappg(db.query, db);
+	var m = new mappg(db, db.query);
 	m.size.then((n) => console.log('size: %d', n));
 	m.set('a', '0').then(() => console.log('set: a=0'));
 	m.set('b', '1').then(() => console.log('set: b=1'));
