@@ -78,11 +78,14 @@ _.clear = function() {
 
 
 _.forEach = function(fn, thisArg) {
-	this.db.query(`SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
-		if(err) throw err;
-		for(var i=0, I=res.rowCount; i<I; i++) {
-			fn.call(thisArg, res.rows[i].val, res.rows[i].key);
-		}
+	return new Promise((fres, frej) => {
+		this.db.query(`SELECT "${this.key}" AS key, "${this.val}" AS val FROM "${this.tab}"`, (err, res) => {
+			if(err) frej(err);
+			for(var i=0, I=res.rowCount; i<I; i++) {
+				fn.call(thisArg, res.rows[i].val, res.rows[i].key);
+			}
+			fres(res.rowCount);
+		});
 	});
 };
 
