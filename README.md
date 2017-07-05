@@ -50,7 +50,7 @@ available on this object. Unlike creating a new `Map` object, if the table menti
 already exists, then the values in the table are considered part of the map. After all,
 that is what makes this a *persistent* map.
 
-``` javascript
+```javascript
 var m = new mappg(<db client>, [<table>], [<key column>], [<value column>]);
 // []: optional arguments
 // <db client>: client object from postgresql pool
