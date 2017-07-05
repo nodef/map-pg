@@ -2,7 +2,7 @@
 /* @wolfram77 */
 'use strict';
 (function() {
-$ = function(fn, ths, tab, key, val) {
+var $ = function(fn, ths, tab, key, val) {
 	this.fn = fn;
 	this.ths = ths;
 	this.tab = tab || 'MAP';
@@ -14,7 +14,7 @@ $ = function(fn, ths, tab, key, val) {
 };
 
 
-_ = $.prototype;
+var _ = $.prototype;
 
 
 Object.defineProperty(_, 'size', {'get': function() {
