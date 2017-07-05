@@ -20,7 +20,7 @@ Object.defineProperty(_, 'size', {'get': function() {
 	return new Promise((fres, frej) => {
 		this.db.query(`SELECT COUNT(*) AS cnt FROM "${this.tab}"`, (err, res) => {
 			if(err) frej(err);
-			else fres(res.rows[0].cnt);
+			else fres(parseInt(res.rows[0].cnt));
 		});
 	});
 }});
@@ -40,7 +40,8 @@ _.get = function(k) {
 	return new Promise((fres, frej) => {
 		this.db.query(`SELECT "${this.val}" AS val FROM "${this.tab}" WHERE "${this.key}"=$1`, [k], (err, res) => {
 			if(err) frej(err);
-			else fres(res.rowCount>0? res.rows[0].val : undefined);
+			else fres(res.rows.length>0? res.rows[0].val : undefined);
+			console.log(res);
 		});
 	});
 };

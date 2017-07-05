@@ -18,17 +18,17 @@ pool.connect(function(err, db, done) {
 	console.log('pg.connect: done');
 	var m = new Map();
 	var M = new mappg(db);
-	M.clear();
-	M.size.then((n) => { if(m.size!==n) throw new Error('size mismatch'); });
+	P = M.clear();
+	M.size.then((n) => { console.log('size: %d vs %d', m.size, n); if(m.size!==n) throw new Error('size mismatch'); });
 	for(var i=0, I=26*Math.random(); i<I; i++) {
 		m.set('a'+i, ''+i);
 		P = M.set('a'+i, ''+i);
 	}
 	P.then(() => {
-		M.size.then((n) => { if(m.size!==n) throw new Error('size mismatch'); });
+		M.size.then((n) => { console.log('size: %d vs %d', m.size, n); if(m.size!==n) throw new Error('size mismatch'); });
 		for(var i=0; i<26; i++) {
 			M.has('a'+i).then((v) => { if(m.has('a'+i)!==v) throw new Error('has mismatch'); });
-			M.get('a'+i).then((v) => { if(m.get('a'+i)!==v) throw new Error('get mismatch'); });
+			M.get('a'+i).then((v) => { console.log('%s vs %s', m.get('a'+i), v); if(m.get('a'+i)!==v) throw new Error('get mismatch'); });
 		}
 	});
 	for(var i=0, I=26*Math.random(); i<I; i++) {
@@ -36,10 +36,10 @@ pool.connect(function(err, db, done) {
 		P = M.delete('a'+i);
 	}
 	P.then(() => {
-		M.size.then((n) => { if(m.size!==n) throw new Error('size mismatch'); });
+		M.size.then((n) => { console.log('size: %d vs %d', m.size, n); if(m.size!==n) throw new Error('size mismatch'); });
 		for(var i=0; i<26; i++) {
 			M.has('a'+i).then((v) => { if(m.has('a'+i)!==v) throw new Error('has mismatch'); });
-			M.get('a'+i).then((v) => { if(m.get('a'+i)!==v) throw new Error('get mismatch'); });
+			M.get('a'+i).then((v) => { console.log('%s vs %s', m.get('a'+i), v); if(m.get('a'+i)!==v) throw new Error('get mismatch'); });
 		}
 	});
 	M.forEach((v, k) => {
