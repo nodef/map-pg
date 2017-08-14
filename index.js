@@ -10,16 +10,13 @@ var $ = function(db, tab, key, val) {
 };
 module.exports = $;
 
-
 var _ = $.prototype;
-
 
 Object.defineProperty(_, 'size', {'get': function() {
 	return this._db.query(
 		`SELECT COUNT(*) AS n FROM ${this._tab};`
 	).then((ans) => parseInt(ans.rows[0].n));
 }});
-
 
 _.has = function(k) {
 	return this._db.query(
@@ -28,14 +25,12 @@ _.has = function(k) {
 	).then((ans) => ans.rowCount===1);
 };
 
-
 _.get = function(k) {
 	return this._db.query(
 		`SELECT "${this._val}" AS v FROM "${this._tab}" `+
 		`WHERE "${this._key}"=$1;`, [k]
 	).then((ans) => ans.rowCount? ans.rows[0].v : undefined);
 };
-
 
 _.set = function(k, v) {
 	return this._db.query(
@@ -45,7 +40,6 @@ _.set = function(k, v) {
 	).then((ans) => ans.rowCount);
 };
 
-
 _.delete = function(k) {
 	return this._db.query(
 		`DELETE FROM "${this._tab}" `+
@@ -53,13 +47,11 @@ _.delete = function(k) {
 	).then((ans) => ans.rowCount);
 };
 
-
 _.clear = function() {
 	return this._db.query(
 		`DELETE FROM "${this._tab}";`
 	).then((ans) => ans.rowCount);
 };
-
 
 _.valueOf = function() {
 	return this._db.query(
@@ -72,21 +64,17 @@ _.valueOf = function() {
 	});
 };
 
-
 _.entries = function() {
 	return this.valueOf().then((ans) => ans.entries());
 };
-
 
 _.keys = function() {
 	return this.valueOf().then((ans) => ans.keys());
 };
 
-
 _.values = function() {
 	return this.valueOf().then((ans) => ans.values());
 };
-
 
 _.forEach = function(fn, thisArg) {
 	return this._db.query(
