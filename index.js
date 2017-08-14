@@ -1,8 +1,8 @@
 var $ = function(db, tab, key, val) {
 	this._db = db;
-	this._tab = tab||'MAP';
+	this._tab = tab||'map';
 	this._key = key||'key';
-	this._val = val||'val';
+	this._val = val||'value';
 	this._db.query(
 		`CREATE TABLE IF NOT EXISTS "${this._tab}" `+
 		`("${this._key}" TEXT PRIMARY KEY, "${this._val}" TEXT)`
