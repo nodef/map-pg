@@ -3,7 +3,7 @@ var $ = function(db, tab, key, val) {
 	this.tab = tab || 'MAP';
 	this.key = key || 'key';
 	this.val = val || 'val';
-	this.db.query(`CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`;
+	this.db.query(`CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`);
 };
 module.exports = $;
 
