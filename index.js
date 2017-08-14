@@ -5,7 +5,7 @@ var $ = function(db, tab, key, val) {
 	this._val = val||'value';
 	this._db.query(
 		`CREATE TABLE IF NOT EXISTS "${this._tab}" `+
-		`("${this._key}" TEXT PRIMARY KEY, "${this._val}" TEXT)`
+		`("${this._key}" TEXT PRIMARY KEY, "${this._val}" TEXT);`
 	);
 };
 module.exports = $;
@@ -84,4 +84,16 @@ _.forEach = function(fn, thisArg) {
 			fn.call(thisArg, ans.rows[i].v, ans.rows[i].k);
 		return ans.rowCount;
 	});
+};
+
+_.find = function(sch) {
+	var i = 0, par = [], exp = '';
+	for(var k in sch) {
+		exp += `${k} LIKE `+'$'+(i++);
+		par.push(sch[k]);
+	}
+	return this._db.query(
+    `SELECT * FROM "${this._tab}"`+
+    (exp? ' WHERE '+exp : '')+';', par
+  );
 };
