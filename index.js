@@ -1,7 +1,3 @@
-/* MAP-PG: Map interface for PostgreSQL. */
-/* @wolfram77 */
-'use strict';
-(function() {
 var $ = function(db, tab, key, val) {
 	this.db = db;
 	this.tab = tab || 'MAP';
@@ -11,6 +7,7 @@ var $ = function(db, tab, key, val) {
 		if(err) throw err;
 	});
 };
+module.exports = $;
 
 
 var _ = $.prototype;
@@ -128,7 +125,3 @@ _.values = function() {
 		v.catch((err) => { frej(err); });
 	});
 };
-
-
-module.exports = $;
-})();
