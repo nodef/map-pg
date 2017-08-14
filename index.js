@@ -1,9 +1,12 @@
 var $ = function(db, tab, key, val) {
-	this.db = db;
-	this.tab = tab || 'MAP';
-	this.key = key || 'key';
-	this.val = val || 'val';
-	this.db.query(`CREATE TABLE IF NOT EXISTS "${this.tab}"("${this.key}" TEXT PRIMARY KEY, "${this.val}" TEXT)`);
+	this._db = db;
+	this._tab = tab||'MAP';
+	this._key = key||'key';
+	this._val = val||'val';
+	this._db.query(
+		`CREATE TABLE IF NOT EXISTS "${this._tab}" `+
+		`("${this._key}" TEXT PRIMARY KEY, "${this._val}" TEXT)`
+	);
 };
 module.exports = $;
 
@@ -12,55 +15,55 @@ var _ = $.prototype;
 
 
 Object.defineProperty(_, 'size', {'get': function() {
-	return this.db.query(
-		`SELECT COUNT(*) AS n FROM ${this.tab};`
+	return this._db.query(
+		`SELECT COUNT(*) AS n FROM ${this._tab};`
 	).then((ans) => parseInt(ans.rows[0].n));
 }});
 
 
 _.has = function(k) {
-	return this.db.query(
-		`SELECT "${this.key}" FROM "${this.tab}" `+
-		`WHERE "${this.key}"=$1;`, [k]
+	return this._db.query(
+		`SELECT "${this._key}" FROM "${this._tab}" `+
+		`WHERE "${this._key}"=$1;`, [k]
 	).then((ans) => ans.rowCount===1);
 };
 
 
 _.get = function(k) {
-	return this.db.query(
-		`SELECT "${this.val}" AS v FROM "${this.tab}" `+
-		`WHERE "${this.key}"=$1;`, [k]
+	return this._db.query(
+		`SELECT "${this._val}" AS v FROM "${this._tab}" `+
+		`WHERE "${this._key}"=$1;`, [k]
 	).then((ans) => ans.rowCount? ans.rows[0].v : undefined);
 };
 
 
 _.set = function(k, v) {
-	return this.db.query(
-		`INSERT INTO "${this.tab}" ("${this.key}", "${this.val}") `+
-		`VALUES ($1, $2) ON CONFLICT ("${this.key}") `+
-		`DO UPDATE SET "${this.val}"=$2;`, [k, v]
+	return this._db.query(
+		`INSERT INTO "${this._tab}" ("${this._key}", "${this._val}") `+
+		`VALUES ($1, $2) ON CONFLICT ("${this._key}") `+
+		`DO UPDATE SET "${this._val}"=$2;`, [k, v]
 	).then((ans) => ans.rowCount);
 };
 
 
 _.delete = function(k) {
-	return this.db.query(
-		`DELETE FROM "${this.tab}" `+
-		`WHERE "${this.key}"=$1;`, [k]
+	return this._db.query(
+		`DELETE FROM "${this._tab}" `+
+		`WHERE "${this._key}"=$1;`, [k]
 	).then((ans) => ans.rowCount);
 };
 
 
 _.clear = function() {
-	return this.db.query(
-		`DELETE FROM "${this.tab}";`
+	return this._db.query(
+		`DELETE FROM "${this._tab}";`
 	).then((ans) => ans.rowCount);
 };
 
 
 _.valueOf = function() {
-	return this.db.query(
-		`SELECT "${this.key}" AS k, "${this.val}" AS v FROM "${this.tab}";`
+	return this._db.query(
+		`SELECT "${this._key}" AS k, "${this._val}" AS v FROM "${this._tab}";`
 	).then((ans) => {
 		var a = new Map();
 		for(var i=0, I=res.rowCount; i<I; i++)
@@ -86,8 +89,8 @@ _.values = function() {
 
 
 _.forEach = function(fn, thisArg) {
-	return this.db.query(
-		`SELECT "${this.key}" AS k, "${this.val}" AS v FROM "${this.tab}"`
+	return this._db.query(
+		`SELECT "${this._key}" AS k, "${this._val}" AS v FROM "${this._tab}"`
 	).then((ans) => {
 		for(var i=0, I=ans.rowCount; i<I; i++)
 			fn.call(thisArg, ans.rows[i].v, ans.rows[i].k);
