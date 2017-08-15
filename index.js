@@ -1,12 +1,22 @@
-var $ = function(db, tab, key, val) {
+var _format = require('object-format');
+var _pull = require('object-pull');
+var _pullv = require('object-pullvalues');
+var _array = require('array-to');
+
+var $ = function(db, tab, col, key, val) {
   this._db = db;
   this._tab = tab||'map';
   this._key = key||'key';
   this._val = val||'value';
-  this._db.query(
-    `CREATE TABLE IF NOT EXISTS "${this._tab}" `+
-    `("${this._key}" TEXT PRIMARY KEY, "${this._val}" TEXT);`
-  );
+  this._keys = _format(_array(this._key), '"%v"');
+  this._where = _format(this._key, '"%v"=$%i', ' AND ', 1);
+  col = col||{'key': 'TEXT', 'value': 'TEXT'};
+  return this._db.query(
+    `CREATE TABLE IF NOT EXISTS "${this._tab}" (`+
+    `${_format(col, '"%k" %v')}`+
+    `PRIMARY KEY (${this._keys})`
+    `);`
+  ).then(() => this);
 };
 module.exports = $;
 
@@ -20,30 +30,32 @@ Object.defineProperty(_, 'size', {'get': function() {
 
 _.has = function(k) {
   return this._db.query(
-    `SELECT "${this._key}" FROM "${this._tab}" `+
-    `WHERE "${this._key}"=$1;`, [k]
+    `SELECT * FROM "${this._tab}" `+
+    `WHERE ${this._where};`, _array(_pullv(k, this._key))
   ).then((ans) => ans.rowCount===1);
 };
 
 _.get = function(k) {
   return this._db.query(
-    `SELECT "${this._val}" AS v FROM "${this._tab}" `+
-    `WHERE "${this._key}"=$1;`, [k]
-  ).then((ans) => ans.rowCount? ans.rows[0].v : undefined);
+    `SELECT * FROM "${this._tab}" `+
+    `WHERE ${this._where};`, _array(_pullv(k, this._key))
+  ).then((ans) => ans.rowCount? _pull(ans.rows[0], this._val) : undefined);
 };
 
 _.set = function(k, v) {
+  if(v===undefined) return this.delete(k);
+  var par = [], kv = Object.assign({}, k, v);
   return this._db.query(
-    `INSERT INTO "${this._tab}" ("${this._key}", "${this._val}") `+
-    `VALUES ($1, $2) ON CONFLICT ("${this._key}") `+
-    `DO UPDATE SET "${this._val}"=$2;`, [k, v]
+    `INSERT INTO "${this._tab}" (${_format(kv, '"%k"', ',', 1, par)}) `+
+    `VALUES (${_format(kv, '$%i', ',', 1)}) ON CONFLICT (${this._keys}) `+
+    `DO UPDATE SET ${_format(v, '"%k"=$%i', ',', par.length+1, par)};`, par
   ).then((ans) => ans.rowCount);
 };
 
 _.delete = function(k) {
   return this._db.query(
     `DELETE FROM "${this._tab}" `+
-    `WHERE "${this._key}"=$1;`, [k]
+    `WHERE ${this._where};`, _array(_pullv(k, this._key))
   ).then((ans) => ans.rowCount);
 };
 
@@ -53,13 +65,27 @@ _.clear = function() {
   ).then((ans) => ans.rowCount);
 };
 
+_.forEach = function(fn, thisArg) {
+  return this._db.query(
+    `SELECT * FROM "${this._tab}";`
+  ).then((ans) => {
+    for(var i=0, I=ans.rowCount; i<I; i++) {
+      var r = ans.rows[i];
+      fn.call(thisArg, _pull(r, this._val), _pull(r, this._key));
+    }
+    return ans.rowCount;
+  });
+};
+
 _.valueOf = function() {
   return this._db.query(
-    `SELECT "${this._key}" AS k, "${this._val}" AS v FROM "${this._tab}";`
+    `SELECT * FROM "${this._tab}";`
   ).then((ans) => {
     var a = new Map();
-    for(var i=0, I=res.rowCount; i<I; i++)
-      a.set(ans.rows[i].k, ans.rows[i].v);
+    for(var i=0, I=ans.rowCount; i<I; i++) {
+      var r = ans.rows[i];
+      a.set(_pull(r, this._key), _pull(r, this._val));
+    }
     return a;
   });
 };
@@ -76,22 +102,8 @@ _.values = function() {
   return this.valueOf().then((ans) => ans.values());
 };
 
-_.forEach = function(fn, thisArg) {
-  return this._db.query(
-    `SELECT "${this._key}" AS k, "${this._val}" AS v FROM "${this._tab}"`
-  ).then((ans) => {
-    for(var i=0, I=ans.rowCount; i<I; i++)
-      fn.call(thisArg, ans.rows[i].v, ans.rows[i].k);
-    return ans.rowCount;
-  });
-};
-
 _.find = function(sch) {
-  var i = 0, par = [], exp = '';
-  for(var k in sch) {
-    exp += `${k} LIKE `+'$'+(i++);
-    par.push(sch[k]);
-  }
+  var par = [], exp = _format(sch, '"%k" LIKE $%i', ' AND ', 1, par);
   return this._db.query(
     `SELECT * FROM "${this._tab}"`+
     (exp? ' WHERE '+exp : '')+';', par
