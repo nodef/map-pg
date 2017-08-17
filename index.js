@@ -28,20 +28,6 @@ Object.defineProperty(_, 'size', {'get': function() {
   ).then((ans) => parseInt(ans.rows[0].n));
 }});
 
-_.has = function(k) {
-  return this._db.query(
-    `SELECT * FROM "${this._tab}" `+
-    `WHERE ${this._where};`, _array(_pullv(k, this._key))
-  ).then((ans) => ans.rowCount===1);
-};
-
-_.get = function(k) {
-  return this._db.query(
-    `SELECT * FROM "${this._tab}" `+
-    `WHERE ${this._where};`, _array(_pullv(k, this._key))
-  ).then((ans) => ans.rowCount? _pull(ans.rows[0], this._val) : undefined);
-};
-
 _.set = function(k, v) {
   if(v===undefined) return this.delete(k);
   var par = [], kv = Object.assign({}, k, v);
@@ -52,11 +38,25 @@ _.set = function(k, v) {
   ).then((ans) => ans.rowCount);
 };
 
+_.get = function(k) {
+  return this._db.query(
+    `SELECT * FROM "${this._tab}" `+
+    `WHERE ${this._where};`, _array(_pullv(k, this._key))
+  ).then((ans) => ans.rowCount? _pull(ans.rows[0], this._val) : undefined);
+};
+
 _.delete = function(k) {
   return this._db.query(
     `DELETE FROM "${this._tab}" `+
     `WHERE ${this._where};`, _array(_pullv(k, this._key))
   ).then((ans) => ans.rowCount);
+};
+
+_.has = function(k) {
+  return this._db.query(
+    `SELECT * FROM "${this._tab}" `+
+    `WHERE ${this._where};`, _array(_pullv(k, this._key))
+  ).then((ans) => ans.rowCount===1);
 };
 
 _.clear = function() {
@@ -100,12 +100,4 @@ _.keys = function() {
 
 _.values = function() {
   return this.valueOf().then((ans) => ans.values());
-};
-
-_.find = function(sch) {
-  var par = [], exp = _format(sch, '"%k" LIKE $%i', ' AND ', 1, par);
-  return this._db.query(
-    `SELECT * FROM "${this._tab}"`+
-    (exp? ' WHERE '+exp : '')+';', par
-  );
 };

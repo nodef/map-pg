@@ -2,7 +2,23 @@
 
 [![NPM](https://nodei.co/npm/map-pg.png)](https://nodei.co/npm/map-pg/)
 
-Map interface for PostgreSQL in Node.js.
+Promised Map interface for Table in PostgreSQL.
+
+```javascript
+var MapPg = require('MapPg');
+// new MapPg(<connection>, <table>, <column types>, <key columns>, <value columns>);
+// MapPg.prototype.size
+// MapPg.prototype.set(<key>, <value>)
+// MapPg.prototype.get(<key>)
+// MapPg.prototype.delete(<key>)
+// MapPg.prototype.has(<key>)
+// MapPg.prototype.clear()
+// MapPg.prototype.forEach(<function>, <this arg>)
+// MapPg.prototype.valueOf()
+// MapPg.prototype.entries()
+// MapPg.prototype.keys()
+// MapPg.prototype.values()
+```
 
 
 ## intro
