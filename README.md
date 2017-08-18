@@ -7,7 +7,7 @@
 ```javascript
 var pg = require('pg');
 var pgconfig = require('pg-connection-string').parse;
-var MapPg = require('MapPg');
+var MapPg = require('map-pg');
 // new MapPg(<connection>, <table>, <column types>, <key columns>, <value columns>);
 // MapPg.prototype.size
 // MapPg.prototype.set(<key>, <value>)
