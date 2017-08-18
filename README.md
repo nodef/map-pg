@@ -48,7 +48,7 @@ pool.connect((err, db, done) => {
     whyd.size.then((ans) => ans);
     // -> 4
     
-    whya.get('Why so serious').then((ans) => ans);
+    whya.get('Why so serious?').then((ans) => ans);
     // -> 'You are joker?'
     whyb.get('Why are you so happy at the end of every month?').then((ans) => ans);
     // -> {'a': 'Because there are 2 moons on that night.'}
@@ -59,11 +59,13 @@ pool.connect((err, db, done) => {
     whya.get('Hello Nanana').then((ans) => ans);
     // -> undefined
     
-    whya.delete('Why so serious').then((ans) => ans);
+    whya.delete('Why so serious?').then((ans) => ans);
     // -> 1
     whyd.set({'q': 'Why are you so happy at the end of every month?'}, undefined).then((ans) => ans);
     // -> 1 (set(key, undefined) is same as delete)
 
+    whya.size.then((ans) => ans);
+    // -> 2
     // ...
   });
   done();

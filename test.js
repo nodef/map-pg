@@ -61,6 +61,9 @@ pool.connect((err, db, done) => {
       assert.deepEqual(ans, 1);
     });
 
+    whya.size.then((ans) => {
+      assert.equal(ans, 2);
+    });
     // ...
   });
   done();
