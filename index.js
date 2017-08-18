@@ -2,19 +2,19 @@ var _format = require('object-format');
 var _pull = require('object-pull');
 var _pullv = require('object-pullvalues');
 var _array = require('array-to');
+var _object = require('object-to');
 
 var $ = function(db, tab, col, key, val) {
   this._db = db;
   this._tab = tab||'map';
   this._key = key||'key';
   this._val = val||'value';
-  this._keys = _format(_array(this._key), '"%v"');
   this._where = _format(this._key, '"%v"=$%i', ' AND ', 1);
-  col = col||{'key': 'TEXT', 'value': 'TEXT'};
+  this._col = col||{'key': 'TEXT', 'value': 'TEXT'};
   return this._db.query(
     `CREATE TABLE IF NOT EXISTS "${this._tab}" (`+
-    `${_format(col, '"%k" %v')}`+
-    `PRIMARY KEY (${this._keys})`
+    `${_format(this._col, '"%k" %v')}, `+
+    `PRIMARY KEY (${_format(_array(this._key), '"%v"')})`+
     `);`
   ).then(() => this);
 };
@@ -30,7 +30,7 @@ Object.defineProperty(_, 'size', {'get': function() {
 
 _.set = function(k, v) {
   if(v===undefined) return this.delete(k);
-  var par = [], kv = Object.assign({}, k, v);
+  var par = [], kv = Object.assign({}, _object(k, this._key), _object(v, this._val));
   return this._db.query(
     `INSERT INTO "${this._tab}" (${_format(kv, '"%k"', ',', 1, par)}) `+
     `VALUES (${_format(kv, '$%i', ',', 1)}) ON CONFLICT (${this._keys}) `+
@@ -65,18 +65,6 @@ _.clear = function() {
   ).then((ans) => ans.rowCount);
 };
 
-_.forEach = function(fn, thisArg) {
-  return this._db.query(
-    `SELECT * FROM "${this._tab}";`
-  ).then((ans) => {
-    for(var i=0, I=ans.rowCount; i<I; i++) {
-      var r = ans.rows[i];
-      fn.call(thisArg, _pull(r, this._val), _pull(r, this._key));
-    }
-    return ans.rowCount;
-  });
-};
-
 _.valueOf = function() {
   return this._db.query(
     `SELECT * FROM "${this._tab}";`
@@ -87,6 +75,13 @@ _.valueOf = function() {
       a.set(_pull(r, this._key), _pull(r, this._val));
     }
     return a;
+  });
+};
+
+_.forEach = function(fn, thisArg) {
+  return this.valueOf().then((ans) => {
+    ans.forEach(fn, thisArg);
+    return ans.size;
   });
 };
 

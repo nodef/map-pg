@@ -36,7 +36,7 @@ pool.connect((err, db, done) => {
     // -> 1
     whyc.set('Why are you so happy at the end of every month?', {'a': 'Because there are 2 moons on that night.'}).then((ans) => ans);
     // -> 1
-    whyd.set({'q': 'Why so serious?'}, {'a': 'You are joker?'});
+    whyd.set({'q': 'Why so serious?'}, {'a': 'You are joker?'}).then((ans) => ans);
     // -> 1
     
     whya.size.then((ans) => ans);
