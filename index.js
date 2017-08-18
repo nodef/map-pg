@@ -9,12 +9,13 @@ var $ = function(db, tab, col, key, val) {
   this._tab = tab||'map';
   this._key = key||'key';
   this._val = val||'value';
+  this._keys = _format(_array(this._key), '"%v"');
   this._where = _format(this._key, '"%v"=$%i', ' AND ', 1);
   this._col = col||{'key': 'TEXT', 'value': 'TEXT'};
   return this._db.query(
     `CREATE TABLE IF NOT EXISTS "${this._tab}" (`+
     `${_format(this._col, '"%k" %v')}, `+
-    `PRIMARY KEY (${_format(_array(this._key), '"%v"')})`+
+    `PRIMARY KEY (${this._keys})`+
     `);`
   ).then(() => this);
 };
@@ -30,7 +31,8 @@ Object.defineProperty(_, 'size', {'get': function() {
 
 _.set = function(k, v) {
   if(v===undefined) return this.delete(k);
-  var par = [], kv = Object.assign({}, _object(k, this._key), _object(v, this._val));
+  var k = _object(k, this._key), v = _object(v, this._val);
+  var par = [], kv = Object.assign({}, k, v);
   return this._db.query(
     `INSERT INTO "${this._tab}" (${_format(kv, '"%k"', ',', 1, par)}) `+
     `VALUES (${_format(kv, '$%i', ',', 1)}) ON CONFLICT (${this._keys}) `+

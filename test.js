@@ -38,7 +38,7 @@ pool.connect((err, db, done) => {
       assert.equal(ans, 4);
     });
     
-    whya.get('Why so serious').then((ans) => {
+    whya.get('Why so serious?').then((ans) => {
       assert.equal(ans, 'You are joker?');
     });
     whyb.get('Why are you so happy at the end of every month?').then((ans) => {
@@ -48,13 +48,13 @@ pool.connect((err, db, done) => {
       assert.deepEqual(ans, {'q': 'What is that big pipe?', 'a': 'Its called postbox and it is where you came from.'});
     });
     whyd.get({'q': 'Why is the sky blue, yellow, red, black and white?'}).then((ans) => {
-      assert.equal(ans, {'q': 'Why is the sky blue, yellow, red, black and white?', 'a': 'Because your eyes are painted on the inside.'});
+      assert.deepEqual(ans, {'q': 'Why is the sky blue, yellow, red, black and white?', 'a': 'Because your eyes are painted on the inside.'});
     });
     whya.get('Hello Nanana').then((ans) => {
       assert.equal(undefined);
     });
     
-    whya.delete('Why so serious').then((ans) => {
+    whya.delete('Why so serious?').then((ans) => {
       assert.equal(ans, 1);
     });
     whyd.set({'q': 'Why are you so happy at the end of every month?'}, undefined).then((ans) => {
