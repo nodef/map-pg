@@ -3,6 +3,7 @@ var _pull = require('object-pull');
 var _pullv = require('object-pullvalues');
 var _array = require('array-to');
 var _object = require('object-to');
+var _pullmap = require('objectarray-pullmap');
 
 var $ = function(db, tab, col, key, val) {
   this._db = db;
@@ -70,14 +71,7 @@ _.clear = function() {
 _.valueOf = function() {
   return this._db.query(
     `SELECT * FROM "${this._tab}";`
-  ).then((ans) => {
-    var a = new Map();
-    for(var i=0, I=ans.rowCount; i<I; i++) {
-      var r = ans.rows[i];
-      a.set(_pull(r, this._key), _pull(r, this._val));
-    }
-    return a;
-  });
+  ).then((ans) => _pullmap(ans.rows||[], this._key, this._val));
 };
 
 _.forEach = function(fn, thisArg) {

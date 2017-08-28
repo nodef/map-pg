@@ -1,6 +1,6 @@
 {
   "name": "map-pg",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Map interface for PostgreSQL in Node.js.",
   "main": "index.js",
   "dependencies": {
@@ -9,6 +9,7 @@
     "object-pull": "0.0",
     "object-pullvalues": "0.0",
     "object-to": "0.0",
+    "objectarray-pullmap": "0.0",
     "pg": "7"
   },
   "devDependencies": {
