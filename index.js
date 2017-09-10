@@ -13,7 +13,7 @@ const $ = function MapPg(db, tab, typ, key, val) {
   this._val = val||'value';
   this._typ = typ||{'key': 'TEXT', 'value': 'TEXT'};
   this._keys = _format(_array(this._key), '"%v"');
-  this._where = _format(this._key, '"%v"=$%i', ' AND ', 1);
+  this._where = _format(_array(this._key), '"%v"=$%i', ' AND ', 1);
 };
 module.exports = $;
 

@@ -9,8 +9,7 @@ var req = https.get('https://ci-postgresql.herokuapp.com', (res) => {
   res.on('data', (chunk) => data += chunk);
   res.on('end', () => {
     var url = data;
-    console.log('db: '+url);
-    var pool = new pg.Pool(pgconfig(url));
+    var pool = new pg.Pool(pgconfig(url+'?ssl=true'));
     pool.connect(ready);
   })
 });
@@ -24,7 +23,7 @@ var ready = function(err, db, done) {
   var mapb = new MapPg(db, 'map', type, 'key', ['value']);
   var mapc = new MapPg(db, 'map', type, 'key', ['key', 'value']);
   var mapd = new MapPg(db, 'map', type, ['key'], ['key', 'value']);
-  mapa.setup().then(() => console.log('Table created'));
+  mapa.setup().then((err, ans) => console.log('Table created'));
 
   mapa.set('n', 'Noble');
   mapb.set('p', {'value': 'Programming'});
