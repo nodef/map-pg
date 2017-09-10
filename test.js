@@ -10,7 +10,7 @@ var req = https.get('https://ci-postgresql.herokuapp.com', (res) => {
   res.on('end', () => {
     var url = data;
     console.log('db: '+url);
-    var pool = new pg.Pool(pgconfig(process.env.DATABASE_URL));
+    var pool = new pg.Pool(pgconfig(url));
     pool.connect(ready);
   })
 });
