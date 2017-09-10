@@ -1,6 +1,6 @@
 {
   "name": "map-pg",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Promised Map interface for Table in PostgreSQL.",
   "main": "index.js",
   "dependencies": {

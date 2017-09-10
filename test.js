@@ -23,7 +23,7 @@ var ready = function(err, db, done) {
   var mapa = new MapPg(db);
   var mapb = new MapPg(db, 'map', type, 'key', ['value']);
   var mapc = new MapPg(db, 'map', type, 'key', ['key', 'value']);
-  var mapd = new MapPg(db, 'map', tyoe, ['key'], ['key', 'value']);
+  var mapd = new MapPg(db, 'map', type, ['key'], ['key', 'value']);
   mapa.setup().then(() => console.log('Table created'));
 
   mapa.set('n', 'Noble');
