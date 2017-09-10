@@ -38,7 +38,7 @@ pool.connect((err, db, done) => {
     // -> 1
     whyd.set({'q': 'Why so serious?'}, {'a': 'You are joker?'}).then((ans) => ans);
     // -> 1
-    
+
     whya.size.then((ans) => ans);
     // -> 4
     whyb.size.then((ans) => ans);
@@ -47,7 +47,7 @@ pool.connect((err, db, done) => {
     // -> 4
     whyd.size.then((ans) => ans);
     // -> 4
-    
+
     whya.get('Why so serious?').then((ans) => ans);
     // -> 'You are joker?'
     whyb.get('Why are you so happy at the end of every month?').then((ans) => ans);
@@ -58,7 +58,7 @@ pool.connect((err, db, done) => {
     // -> {'q': 'Why is the sky blue, yellow, red, black and white?', 'a': 'Because your eyes are painted on the inside.'}
     whya.get('Hello Nanana').then((ans) => ans);
     // -> undefined
-    
+
     whya.delete('Why so serious?').then((ans) => ans);
     // -> 1
     whyd.set({'q': 'Why are you so happy at the end of every month?'}, undefined).then((ans) => ans);
