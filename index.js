@@ -6,12 +6,12 @@ const _array = require('array-to');
 const _object = require('object-to');
 const _pullmap = require('objectarray-pullmap');
 
-const $ = function MapPg(db, tab, col, key, val) {
+const $ = function MapPg(db, tab, typ, key, val) {
   this._db = db;
   this._tab = tab||'map';
   this._key = key||'key';
   this._val = val||'value';
-  this._col = col||{'key': 'TEXT', 'value': 'TEXT'};
+  this._typ = typ||{'key': 'TEXT', 'value': 'TEXT'};
   this._keys = _format(_array(this._key), '"%v"');
   this._where = _format(this._key, '"%v"=$%i', ' AND ', 1);
 };
@@ -22,7 +22,7 @@ const _ = $.prototype;
 _.setup = function() {
   return this._db.query(
     `CREATE TABLE IF NOT EXISTS "${this._tab}" (`+
-    `${_format(this._col, '"%k" %v')},`+
+    `${_format(this._typ, '"%k" %v')},`+
     `PRIMARY KEY (${this._keys})`+
     `);`
   );

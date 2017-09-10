@@ -5,69 +5,62 @@
 [Promised] [Map] interface for Table in [PostgreSQL].
 
 ```javascript
-var pg = require('pg');
-var pgconfig = require('pg-connection-string').parse;
 var MapPg = require('map-pg');
-// new MapPg(<connection>, <table>, <column types>, <key columns>, <value columns>);
-// MapPg.prototype.size
-// MapPg.prototype.set(<key>, <value>)
-// MapPg.prototype.get(<key>)
-// MapPg.prototype.delete(<key>)
-// MapPg.prototype.has(<key>)
-// MapPg.prototype.clear()
-// MapPg.prototype.forEach(<function>, <this arg>)
-// MapPg.prototype.valueOf()
-// MapPg.prototype.entries()
-// MapPg.prototype.keys()
-// MapPg.prototype.values()
+// new MapPg(<db>, [<table>], [<type>], [<key>], [<value>]);
+// db:    database connection (dont use pool to avoid inconsistency)
+// table: name of database table (default = "map")
+// type:  datatype of columns (default = {"key": "TEXT", "value": "TEXT"})
+// key:   key columns (default = "key")
+// value: value columns (default = "value")
+// (NOTE: call .setup() if table does not exist)
+```
+```javascript
+var pg = require('pg');
+var MapPg = require('map-pg');
 
-var pool = new pg.Pool(pgconfig(url)); // put your db url here
+var pool = new pg.Pool(DB_CONFIG);
+var type = {
+  "key": "TEXT",
+  "value": "TEXT"
+};
 pool.connect((err, db, done) => {
-  var whypa = new MapPg(db, 'why', {'q': 'text', 'a': 'text'}, 'q', 'a');
-  var whypb = new MapPg(db, 'why', {'q': 'text', 'a': 'text'}, 'q', ['a']);
-  var whypc = new MapPg(db, 'why', {'q': 'text', 'a': 'text'}, 'q', ['q', 'a']);
-  var whypd = new MapPg(db, 'why', {'q': 'text', 'a': 'text'}, ['q'], ['q', 'a']);
-  Promise.all([whypa, whypb, whypc, whypd]).then((why) => {
-    var whya = why[0], whyb = why[1], whyc = why[2], whyd = why[3];
+  var mapa = new MapPg(db);
+  var mapb = new MapPg(db, 'map', type, 'key', ['value']);
+  var mapc = new MapPg(db, 'map', type, 'key', ['key', 'value']);
+  var mapd = new MapPg(db, 'map', tyoe, ['key'], ['key', 'value']);
 
-    whya.set('Why is the sky blue, yellow, red, black and white?', 'Because your eyes are painted on the inside.').then((ans) => ans);
-    // -> 1
-    whyb.set('What is that big pipe?', {'a': 'Its called postbox and it is where you came from.'}).then((ans) => ans);
-    // -> 1
-    whyc.set('Why are you so happy at the end of every month?', {'a': 'Because there are 2 moons on that night.'}).then((ans) => ans);
-    // -> 1
-    whyd.set({'q': 'Why so serious?'}, {'a': 'You are joker?'}).then((ans) => ans);
-    // -> 1
+  // create the table "map" (all use same table, so 1 setup is enough)
+  // note: if you are using pool, do anything after setup().then()
+  mapa.setup().then(() => console.log('Table created'));
+  // Table created
 
-    whya.size.then((ans) => ans);
-    // -> 4
-    whyb.size.then((ans) => ans);
-    // -> 4
-    whyc.size.then((ans) => ans);
-    // -> 4
-    whyd.size.then((ans) => ans);
-    // -> 4
+  mapa.set('n', 'Noble');
+  mapb.set('p', {'value': 'Programming'});
+  mapc.set('m', {'value': 'Mantra'});
+  mapd.set('.', {'value': '2012'}).then(() => console.log('"." set'));
+  // "." set
 
-    whya.get('Why so serious?').then((ans) => ans);
-    // -> 'You are joker?'
-    whyb.get('Why are you so happy at the end of every month?').then((ans) => ans);
-    // -> {'a': 'Because there are 2 moons on that night.'}
-    whyc.get('What is that big pipe?').then((ans) => ans);
-    // -> {'q': 'What is that big pipe?', 'a': 'Its called postbox and it is where you came from.'}
-    whyd.get({'q': 'Why is the sky blue, yellow, red, black and white?'}).then((ans) => ans);
-    // -> {'q': 'Why is the sky blue, yellow, red, black and white?', 'a': 'Because your eyes are painted on the inside.'}
-    whya.get('Hello Nanana').then((ans) => ans);
-    // -> undefined
+  mapa.size.then((ans) => ans); // 4
+  mapb.size.then((ans) => ans); // 4
+  mapc.size.then((ans) => ans); // 4
+  mapd.size.then((ans) => ans); // 4
 
-    whya.delete('Why so serious?').then((ans) => ans);
-    // -> 1
-    whyd.set({'q': 'Why are you so happy at the end of every month?'}, undefined).then((ans) => ans);
-    // -> 1 (set(key, undefined) is same as delete)
+  mapa.get('.').then((ans) => console.log(ans));
+  // "2012"
+  mapb.get('m').then((ans) => console.log(ans));
+  // {"value": "Mantra"}
+  mapc.get('p').then((ans) => console.log(ans));
+  // {"key": "p", "value": "Programming"}
+  mapd.get({'key': 'n'}).then((ans) => console.log(ans));
+  // {"key": "n", "value": "Noble"}
+  mapa.get('l').then((ans) => console.log(ans));
+  // undefined
 
-    whya.size.then((ans) => ans);
-    // -> 2
-    // ...
-  });
+  mapa.delete('m');
+  mapd.delete('x').then((ans) => ans); // 0
+
+  mapb.size.then((ans) => console.log('new size: '+ans));
+  // new size: 3
   done();
 });
 ```
