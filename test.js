@@ -1,14 +1,25 @@
 var pgconfig = require('pg-connection-string').parse;
 var assert = require('assert');
 var MapPg = require('./');
+var https = require('https');
 var pg = require('pg');
 
-var pool = new pg.Pool(pgconfig(process.env.DATABASE_URL));
+var req = https.get('https://ci-postgresql.herokuapp.com', (res) => {
+  var data = '';
+  res.on('data', (chunk) => data += chunk);
+  res.on('end', () => {
+    var url = data;
+    console.log('db: '+url);
+    var pool = new pg.Pool(pgconfig(process.env.DATABASE_URL));
+    pool.connect(ready);
+  })
+});
+
 var type = {
   "key": "TEXT",
   "value": "TEXT"
 };
-pool.connect((err, db, done) => {
+var ready = function(err, db, done) {
   var mapa = new MapPg(db);
   var mapb = new MapPg(db, 'map', type, 'key', ['value']);
   var mapc = new MapPg(db, 'map', type, 'key', ['key', 'value']);
@@ -36,4 +47,4 @@ pool.connect((err, db, done) => {
 
   mapb.size.then((ans) => assert.equal(ans, 3));
   done();
-});
+};
