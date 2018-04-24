@@ -1,5 +1,7 @@
 # map-pg
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/nodef/map-pg.svg)](https://greenkeeper.io/)
+
 [![NPM](https://nodei.co/npm/map-pg.png)](https://nodei.co/npm/map-pg/)
 
 [Promised] [Map] interface for Table in [PostgreSQL].
