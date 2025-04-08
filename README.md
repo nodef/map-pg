@@ -68,3 +68,5 @@ pool.connect((err, db, done) => {
 [PostgreSQL]: https://www.postgresql.org
 [Map]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Map
 [Promised]: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+![](https://ga-beacon.deno.dev/G-RC63DPBH3P:SH3Eq-NoQ9mwgYeHWxu7cw/github.com/nodef/map-pg)
