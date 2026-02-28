@@ -1,6 +1,6 @@
 {
   "name": "map-pg",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Promised Map interface for Table in PostgreSQL.",
   "main": "index.js",
   "dependencies": {
@@ -10,10 +10,10 @@
     "object-pullvalues": "0.0",
     "object-to": "0.0",
     "objectarray-pullmap": "0.0",
-    "pg": "7"
+    "pg": "8"
   },
   "devDependencies": {
-    "pg-connection-string": "0.1"
+    "pg-connection-string": "2.11"
   },
   "scripts": {
     "test": "node test"
